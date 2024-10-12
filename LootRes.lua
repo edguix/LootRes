@@ -10,9 +10,12 @@ local rollers = {}
 local maxRoll = 0
 local reservedNames = ""
 
-local secondsToRoll = 8
+
+local countdownCount = 4 -- this is a variable you can change in order to change the coundown as opposed to fixed seconds. 
+local secondTicks = 2 -- another variable. This is how long each tick of the countdown will take. by increasing this number we can effectively lower the amount of chatter in raid lead chat.
+local secondsToRoll = countdownCount*secondTicks -- for now this is not used in the code, but I may change this in future.
 local T = 2
-local C = secondsToRoll
+local C = countdownCount
 local lastRolledItem = ""
 local offspecRoll = false
 
@@ -404,14 +407,18 @@ end)
 
 rollTimer:SetScript("OnUpdate", function()
     if (math.floor(GetTime()) == math.floor(this.startTime) + 2) then
-        if (T ~= secondsToRoll + 1) then
+      --if (T ~= secondsToRoll + 1) then
+        if (T ~= countdownCount + 1) then --replaced above line with this to reflect counts versus absolute seconds
+            
             SendChatMessage("LootRes: " .. (C - T + 1) .. "", "RAID")
         end
         rollTimer:Hide()
         if (T < C + 1) then
             T = T + 1
             rollTimer:Show()
-        elseif (T == secondsToRoll + 1) then
+     -- elseif (T == secondsToRoll + 1) then
+        elseif (T == countdownCount + 1) then --replaced above line with this to reflect counts versus absolute seconds
+                
             SendChatMessage("LootRes: Closed", timerChannel)
             rollTimer:Hide()
             T = 1
@@ -566,8 +573,8 @@ function MC_Loot()
         rollTimer:Hide()
 
         T = 1 --start
-        C = secondsToRoll --count to
-
+      --C = secondsToRoll --count to
+        C = countdownCount --replacing aboveline for couting to the countdown variable
         rollers = {}
         maxRoll = 0
 
@@ -614,7 +621,8 @@ function MC_Loot()
                         rollsOpen = true
                     end
                 else
-                    SendChatMessage(LootRes.trim(reservedNames) .. " (not in raid) is the only one who reserved " .. GameTooltip.itemLink .. ". Anyone can roll as MAIN SPEC ! " .. secondsToRoll .. " Seconds", timerChannel);
+                --  SendChatMessage(LootRes.trim(reservedNames) .. " (not in raid) is the only one who reserved " .. GameTooltip.itemLink .. ". Anyone can roll as MAIN SPEC ! " .. secondsToRoll .. " Seconds", timerChannel);
+                    SendChatMessage(LootRes.trim(reservedNames) .. " (not in raid) is the only one who reserved " .. GameTooltip.itemLink .. ". Anyone can roll as MAIN SPEC ! You have from the count of " .. countdownCount .. " to roll. ", timerChannel); --dialogue changed to reflect countdown
                     rollTimer:Show()
                     rollsOpen = true
                 end
@@ -645,7 +653,8 @@ function MC_Loot()
                     end
                 end
 
-                SendChatMessage(reservedNames .. " ROLL FOR " .. GameTooltip.itemLink .. " " .. secondsToRoll .. " Seconds", timerChannel);
+            --  SendChatMessage(reservedNames .. " ROLL FOR " .. GameTooltip.itemLink .. " " .. secondsToRoll .. " Seconds", timerChannel);
+                SendChatMessage(reservedNames .. " ROLL FOR " .. GameTooltip.itemLink .. " You have from the count of  " .. countdownCount .. " to roll. ", timerChannel); --dialogue changed to reflect countdown change
                 rollTimer:Show()
                 rollsOpen = true
             end
@@ -682,14 +691,17 @@ function MC_Loot()
                 if string.find(GameTooltip.itemLink, 'Earthfury', 1, true) then
                     class = 'SHAMANS'
                 end
-                SendChatMessage(class .. " ONLY - ROLL " .. GameTooltip.itemLink .. "(BOE) " .. secondsToRoll .. " Seconds", timerChannel);
+                --SendChatMessage(class .. " ONLY - ROLL " .. GameTooltip.itemLink .. "(BOE) " .. secondsToRoll .. " Seconds", timerChannel);
+                SendChatMessage(class .. " ONLY - ROLL " .. GameTooltip.itemLink .. "(BOE) You have from the count of " .. countdownCount .. " to roll. ", timerChannel); --dialogue changed to reflect countdown change
             else
 
                 if offspecRoll then
-                    SendChatMessage("OFF SPEC ROLL " .. GameTooltip.itemLink .. " " .. secondsToRoll .. " Seconds", timerChannel);
+                --  SendChatMessage("OFF SPEC ROLL " .. GameTooltip.itemLink .. " " .. secondsToRoll .. " Seconds", timerChannel);
+                    SendChatMessage("OFF SPEC ROLL " .. GameTooltip.itemLink .. " You have from the count of " .. countdownCount .. " to roll. ", timerChannel); --dialogue changed to reflect countdown change
                     lastRolledItem = ""
                 else
-                    SendChatMessage("MAIN SPEC ROLL " .. GameTooltip.itemLink .. " " .. secondsToRoll .. " Seconds (not reserved)", timerChannel);
+                --  SendChatMessage("MAIN SPEC ROLL " .. GameTooltip.itemLink .. " " .. secondsToRoll .. " Seconds (not reserved)", timerChannel);
+                    SendChatMessage("MAIN SPEC ROLL " .. GameTooltip.itemLink .. " You have from the count of " .. countdownCount .. " to roll. (not reserved)", timerChannel); --dialogue changed to reflect countdown change
                 end
             end
 
